@@ -67,7 +67,7 @@ class MultinomialNBTextClassifier(BaseNaiveBayes):
         """ BEGIN TWEET PREPROCESS"""
         #--------------------------------------------------------------------------
         """ tweets is transformed in to a tuple of (word_list, sentiment)  """
-        tweets = util.create_words(tweets)
+        tweets = util.create_features(tweets)
         
         all_words = util.get_all_words(tweets)
         
