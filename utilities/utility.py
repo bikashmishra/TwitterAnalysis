@@ -1,6 +1,8 @@
 import nltk
 import re
 import time
+import tfidf
+import numpy as np
 
 def preprocess(tweet):
     """ remove punctuations has to be last to take care or URL and @ and # properly"""
@@ -23,17 +25,23 @@ def replaceUsername(tweet):
 
 def removeHashtag(tweet):
     """ finds #something and replaces with something"""
-    return re.sub(r'#([^\s]+)', r'\1', tweet)
+#     return re.sub(r'#([^\s]+)', r'\1', tweet)
+    return re.sub(r'#([^\s]+)', r'', tweet)
             
 def removePunctuation(tweet):
-    return re.sub(r'[\'"!?,.$~]','',tweet)
+    return re.sub(r'[\'"!?,.$~:)(*+-]','',tweet)
 
 def getStopWords():
-    stopwordpath = '../Lists/StopWords1.txt'
-    f = open(stopwordpath)
-    stop_words = f.read().split()
+    stopwordpaths = ['../Lists/StopWordsIDF.txt', '../Lists/StopWords2.txt']
+    stop_words = []
+    for stopwordpath in stopwordpaths:
+        f = open(stopwordpath)
+        for w in f.read().split():
+            stop_words.append(w)
+
     stop_words.append('URL')
     stop_words.append('AT_USER')
+    stop_words.append('twitter')
     return stop_words
 
 def replaceRepitions(tweet):
@@ -48,11 +56,14 @@ def create_features(alltweets):
     All words of length < 3 are discarded
     """
     tweet_features = []
+    stop_words = getStopWords()
     for (tweet,sentiment) in alltweets:
         tweet = preprocess(tweet)
-        stop_words = getStopWords()
         # only words with length greater than 2
-        words = [w for w in tweet.split() if (len(w)>=3 and w not in stop_words)]
+        # words not in stop words
+        # words starting with a alphabet not number
+        words = [w for w in tweet.split() if (len(w)>=3 and w not in stop_words
+                                               and re.search(r'^[a-zA-Z][a-zA-Z0-9]*$',w))]
         tweet_features.append((words,sentiment)) # tuple of (list,label_string)
     return tweet_features
 
@@ -65,6 +76,7 @@ def get_all_words(tweets):
 def get_freq_dist(word_list):
     word_list = nltk.FreqDist(word_list)
     return word_list
+
 
 class Timer(object):
     def __init__(self, verbose=False):
