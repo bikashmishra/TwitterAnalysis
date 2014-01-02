@@ -3,7 +3,7 @@ TwitterAnalysis
 -----------------------
 CREATING SQL DATABASE
 -----------------------
-1. Change line 
+1. Change line in sqlscript.py (line 60)
 	db_con = MySQLdb.Connect(<hostname-typically localhost>, <user-typically root>, <password>, 'tweets')
 2. Run sqlscript.py
 This will create a database tweets with different tables
@@ -21,6 +21,8 @@ RUNNING THE CODE
 1. Change collector.config. Query terms are also given in this file. Currently query has to be done manually
 by running Collector.py
 
+2. Once query is done, run sentinal.py (with updated SQL info)
+3. 
 -----------------------
 TO DO
 -----------------------
