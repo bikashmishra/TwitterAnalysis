@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 def idf_stop_words():
-    df2 = pd.io.parsers.read_csv('../TrainingData/Sentiment_Analysis_Dataset.csv', header=0, delimiter='\t', nrows=1000)
+    df2 = pd.io.parsers.read_csv('../TrainingData/Sentiment_Analysis_Dataset.csv', header=0, delimiter='\t', nrows=10000)
 
     sentiment = {0:'negative', 1:'positive'}
     alltweets = []

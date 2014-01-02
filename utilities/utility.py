@@ -41,6 +41,7 @@ def getStopWords():
 
     stop_words.append('URL')
     stop_words.append('AT_USER')
+    stop_words.append('RT')
     stop_words.append('twitter')
     return stop_words
 
