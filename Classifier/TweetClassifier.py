@@ -3,6 +3,8 @@ from scipy import misc, sparse
 from itertools import izip
 import abc
 import utility as util
+from sklearn import metrics
+import re
 
 class BaseNaiveBayes():
     """ 
@@ -26,7 +28,7 @@ class BaseNaiveBayes():
             array_like [nexamples] with entry being label
         """
         class_prob = self.log_likelihood(X)
-        print class_prob
+        #print class_prob
         return [self.classes_[i] for i in np.argmax(class_prob, axis=1)]
         
     def predict_logprob(self, X):
@@ -127,7 +129,7 @@ class MultinomialNBTextClassifier(BaseNaiveBayes):
         out = (X*self.feature_log_likelihood_.T + self.class_log_prior_)
         return out
     
-    def predict_doc(self, docs, predict_log_p=False):
+    def predict_tweets(self, docs, predict_log_p=False):
         """ 
         Take in a list of docs and cerate a feature array
         of size [nexamples]x[nfeatures]. This can be a sparse matrix
@@ -137,10 +139,15 @@ class MultinomialNBTextClassifier(BaseNaiveBayes):
         nexamples = len(docs)
         X = sparse.lil_matrix((nexamples,nfeatures), dtype=np.float)
         
+        stop_words = util.getStopWords()
+
         iexample = -1
-        for entry in docs:
+        for tweet in docs:
             iexample += 1
-            for f in entry.split():
+            tweet = util.preprocess(tweet)
+            words = [w for w in tweet.split() if (len(w)>=3 and w not in stop_words
+                                               and re.search(r'^[a-zA-Z][a-zA-Z0-9]*$',w))]
+            for f in words:
                 if f in self.features_:
                     X[iexample,self.features_.index(f)] += 1
                 
@@ -148,4 +155,32 @@ class MultinomialNBTextClassifier(BaseNaiveBayes):
             return self.predict(X)
         else:
             return self.predict_logprob(X)
+        
+    def accuracy(self,tweets):
+        """This function takes in tweets as tuples in the form(tweet,label)"""
+        test_tweets = []
+        test_sentiments = []
+        for (t,s) in tweets:
+            test_tweets.append(t)
+            test_sentiments.append(s) 
+        predicted_sentiment = self.predict_tweets(test_tweets, predict_log_p=False)
+        score = metrics.accuracy_score(test_sentiments, predicted_sentiment)
+        return score
+        
+    def top_features(self,n=None):
+        if not n:
+            n = len(self.features_)
+        for c in range(len(self.classes_)):
+            top_features = dict(zip(self.features_,self.feature_log_likelihood_[c]))
+            print 'Top features for class %s :'%self.classes_[c]
+            sorted_features = [(k,v) for v,k in sorted([(v,k) for k,v in top_features.items()], reverse=True)]
+            for i in range(n):
+                print '%s'%(sorted_features[i][0],)
+            print '\n'
+            
+    def add_stop_words(self):
+        pass
+    
+    def number_of_features(self):
+        return len(self.features_)
         
