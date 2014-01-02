@@ -118,6 +118,7 @@ c's
 currently
 dare
 daren't
+day
 definitely
 described
 despite
@@ -523,6 +524,7 @@ thru
 thus
 till
 to
+today
 together
 too
 took
