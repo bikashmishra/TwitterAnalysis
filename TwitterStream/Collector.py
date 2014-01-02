@@ -149,7 +149,6 @@ class Collector():
             try:
                 for buffer in streamBuffers:
                     tweet = buffer['buff'].pop()
-                    print tweet
                     if not tweet:
                         time.sleep(1)
                     else:
